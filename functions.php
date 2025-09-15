@@ -162,20 +162,20 @@ if ( ! function_exists( 'hello_elementor_scripts_styles' ) ) {
 }
 add_action( 'wp_enqueue_scripts', 'hello_elementor_scripts_styles' );
 
-/**
- * Enqueue Signals RTL Styles
- */
-function hello_elementor_signals_rtl_styles() {
-    if ( is_post_type_archive( 'signal' ) || is_singular( 'signal' ) ) {
-        wp_enqueue_style(
-            'signals-rtl',
-            HELLO_THEME_STYLE_URL . 'signals-rtl.css',
-            [],
-            HELLO_ELEMENTOR_VERSION
-        );
-    }
-}
-add_action( 'wp_enqueue_scripts', 'hello_elementor_signals_rtl_styles' );
+// Include Working Signals Manager
+require_once get_template_directory() . '/includes/signals-manager-working.php';
+
+// Configure Signals Subscription Products
+add_filter('signals_subscription_product_ids', function($product_ids) {
+    // Add your subscription product IDs here
+    // Example: return [123, 456]; // Replace with actual product IDs
+    return $product_ids;
+});
+
+// Flush rewrite rules on theme activation
+add_action('after_switch_theme', function() {
+    flush_rewrite_rules();
+});
 
 if ( ! function_exists( 'hello_elementor_register_elementor_locations' ) ) {
 	/**

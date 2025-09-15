@@ -1,0 +1,459 @@
+/* RTL Signals My Account Styles */
+.signals-dashboard,
+.signals-paywall,
+.single-signal {
+    direction: rtl;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Paywall Styles */
+.signals-paywall {
+    max-width: 600px;
+    margin: 40px auto;
+    text-align: center;
+}
+
+.paywall-container {
+    background: white;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    border: 2px solid #0073aa;
+}
+
+.paywall-container h2 {
+    color: #0073aa;
+    font-size: 2.2em;
+    margin-bottom: 20px;
+}
+
+.paywall-description {
+    font-size: 1.1em;
+    color: #555;
+    line-height: 1.6;
+    margin-bottom: 30px;
+}
+
+.paywall-benefits {
+    text-align: right;
+    margin-bottom: 30px;
+}
+
+.paywall-benefits h3 {
+    color: #333;
+    margin-bottom: 15px;
+    font-size: 1.3em;
+}
+
+.paywall-benefits ul {
+    list-style: none;
+    padding: 0;
+}
+
+.paywall-benefits li {
+    padding: 8px 0;
+    color: #555;
+    font-size: 1.05em;
+}
+
+.signals-subscribe-btn {
+    background: #0073aa;
+    color: white;
+    padding: 15px 30px;
+    font-size: 1.2em;
+    font-weight: bold;
+    border-radius: 8px;
+    text-decoration: none;
+    display: inline-block;
+    transition: background-color 0.3s;
+}
+
+.signals-subscribe-btn:hover {
+    background: #005a87;
+    color: white;
+    text-decoration: none;
+}
+
+.paywall-account-status {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+}
+
+.paywall-account-status a {
+    color: #0073aa;
+    text-decoration: none;
+}
+
+.paywall-account-status a:hover {
+    text-decoration: underline;
+}
+
+/* Dashboard Header */
+.signals-header {
+    margin-bottom: 30px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    padding: 25px;
+}
+
+.date-navigation-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.current-date h2 {
+    font-size: 2.2em;
+    color: #0073aa;
+    margin: 0;
+    font-weight: bold;
+}
+
+.navigation-controls {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.nav-btn {
+    background: #0073aa;
+    color: white;
+    padding: 12px 16px;
+    text-decoration: none;
+    border-radius: 8px;
+    font-size: 20px;
+    font-weight: bold;
+    transition: all 0.3s;
+    min-width: 50px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.nav-btn:hover {
+    background: #005a87;
+    color: white;
+    text-decoration: none;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+.date-selectors {
+    display: flex;
+    gap: 12px;
+}
+
+.date-selectors select {
+    padding: 12px 16px;
+    font-size: 16px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    background: white;
+    direction: rtl;
+    min-width: 140px;
+    font-weight: 500;
+    transition: border-color 0.3s;
+}
+
+.date-selectors select:focus {
+    border-color: #0073aa;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(0,115,170,0.1);
+}
+
+/* Signals Table */
+.signals-table-container {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    overflow: hidden;
+    margin-bottom: 30px;
+}
+
+.signals-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0;
+}
+
+.signals-table th {
+    background: linear-gradient(135deg, #0073aa, #005a87);
+    color: white;
+    padding: 18px 12px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 14px;
+    border-bottom: 3px solid #004d73;
+}
+
+.signals-table td {
+    padding: 15px 12px;
+    text-align: center;
+    border-bottom: 1px solid #f0f0f0;
+    vertical-align: middle;
+    font-size: 14px;
+}
+
+.signals-table tr:hover {
+    background-color: #f8f9fa;
+}
+
+.signals-table tr:last-child td {
+    border-bottom: none;
+}
+
+.signal-open {
+    background-color: #f0f8ff;
+}
+
+.signal-closed {
+    background-color: #f8f8f8;
+}
+
+/* Security Number Link */
+.security-number-link {
+    color: #0073aa;
+    text-decoration: none;
+    font-weight: bold;
+    padding: 6px 12px;
+    border-radius: 4px;
+    transition: all 0.3s;
+}
+
+.security-number-link:hover {
+    background: #0073aa;
+    color: white;
+    text-decoration: none;
+}
+
+/* Profit/Loss Styling */
+.profit-loss {
+    font-weight: bold;
+    font-size: 15px;
+}
+
+.profit-positive {
+    color: #28a745;
+}
+
+.profit-negative {
+    color: #dc3545;
+}
+
+.profit-neutral {
+    color: #6c757d;
+}
+
+/* No Signals Message */
+.no-signals {
+    text-align: center;
+    padding: 60px 20px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    margin: 40px 0;
+}
+
+.no-signals p {
+    font-size: 1.3em;
+    color: #6c757d;
+    margin-bottom: 30px;
+}
+
+.latest-signals-preview {
+    margin-top: 40px;
+    text-align: right;
+}
+
+.latest-signals-preview h3 {
+    color: #0073aa;
+    font-size: 1.5em;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #0073aa;
+    padding-bottom: 10px;
+}
+
+/* Single Signal Styles */
+.single-signal {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.back-to-archive {
+    margin-bottom: 25px;
+}
+
+.back-link {
+    color: #0073aa;
+    text-decoration: none;
+    font-weight: bold;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 15px;
+    border: 2px solid #0073aa;
+    border-radius: 6px;
+    transition: all 0.3s;
+}
+
+.back-link:hover {
+    background: #0073aa;
+    color: white;
+    text-decoration: none;
+}
+
+.signal-header {
+    text-align: center;
+    margin-bottom: 40px;
+    padding: 30px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.signal-header h2 {
+    font-size: 2em;
+    color: #333;
+    margin: 0;
+}
+
+.signal-details {
+    background: white;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+/* WooCommerce My Account Integration */
+.woocommerce-MyAccount-navigation ul li.woocommerce-MyAccount-navigation-link--signals a {
+    color: #0073aa;
+    font-weight: bold;
+}
+
+.woocommerce-MyAccount-navigation ul li.woocommerce-MyAccount-navigation-link--signals.is-active a {
+    background: #0073aa;
+    color: white;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .paywall-container {
+        margin: 20px;
+        padding: 25px;
+    }
+    
+    .paywall-container h2 {
+        font-size: 1.8em;
+    }
+    
+    .month-navigation {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .month-selectors {
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    
+    .signals-header h2 {
+        font-size: 1.8em;
+    }
+    
+    .signals-table {
+        font-size: 12px;
+    }
+    
+    .signals-table th,
+    .signals-table td {
+        padding: 10px 6px;
+    }
+    
+    .security-number-link {
+        padding: 4px 8px;
+    }
+    
+    .signal-header {
+        padding: 20px;
+    }
+    
+    .signal-header h2 {
+        font-size: 1.6em;
+    }
+    
+    .signal-details {
+        padding: 25px;
+    }
+}
+
+@media (max-width: 480px) {
+    .signals-table {
+        font-size: 11px;
+    }
+    
+    .signals-table th,
+    .signals-table td {
+        padding: 8px 4px;
+    }
+    
+    .paywall-container h2 {
+        font-size: 1.5em;
+    }
+    
+    .signals-header h2 {
+        font-size: 1.5em;
+    }
+    
+    .signal-header h2 {
+        font-size: 1.4em;
+    }
+    
+    .nav-arrow {
+        padding: 10px 14px;
+        font-size: 16px;
+    }
+    
+    .month-selectors select {
+        min-width: 100px;
+        padding: 8px 12px;
+    }
+}
+
+/* Loading States */
+.signals-loading {
+    text-align: center;
+    padding: 40px;
+    color: #6c757d;
+}
+
+.signals-loading::after {
+    content: "טוען...";
+    font-size: 1.2em;
+}
+
+/* Error States */
+.signals-error {
+    background: #f8d7da;
+    color: #721c24;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+    margin: 20px 0;
+    border: 1px solid #f5c6cb;
+}
+
+/* Success Messages */
+.signals-success {
+    background: #d4edda;
+    color: #155724;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+    margin: 20px 0;
+    border: 1px solid #c3e6cb;
+}

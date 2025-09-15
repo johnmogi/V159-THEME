@@ -1,0 +1,103 @@
+/* Simple Signals Styles */
+.signals-dashboard {
+    direction: rtl;
+    text-align: right;
+    font-family: Arial, sans-serif;
+}
+
+.signals-dashboard h2 {
+    color: #0073aa;
+    border-bottom: 2px solid #0073aa;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+.month-navigation {
+    background: #f9f9f9;
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+.month-navigation select {
+    padding: 8px 12px;
+    margin: 0 5px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    font-size: 14px;
+}
+
+.signals-table {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.signals-table th {
+    background: #0073aa !important;
+    color: white !important;
+    font-weight: bold;
+    text-align: center;
+}
+
+.signals-table td {
+    text-align: center;
+    vertical-align: middle;
+}
+
+.signals-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.signals-table tr:hover {
+    background-color: #f0f8ff;
+}
+
+.signals-paywall {
+    background: #fff;
+    border: 2px solid #0073aa;
+    border-radius: 10px;
+    padding: 40px;
+    text-align: center;
+    margin: 20px 0;
+}
+
+.signals-paywall h2 {
+    color: #0073aa;
+    margin-bottom: 15px;
+}
+
+.signals-paywall .button {
+    background: #0073aa;
+    color: white;
+    padding: 12px 24px;
+    text-decoration: none;
+    border-radius: 5px;
+    display: inline-block;
+    margin-top: 15px;
+}
+
+.signals-paywall .button:hover {
+    background: #005a87;
+}
+
+@media (max-width: 768px) {
+    .signals-table {
+        font-size: 12px;
+    }
+    
+    .signals-table th,
+    .signals-table td {
+        padding: 6px !important;
+    }
+    
+    .month-navigation {
+        text-align: center;
+    }
+    
+    .month-navigation select {
+        display: block;
+        width: 100%;
+        margin: 5px 0;
+    }
+}
