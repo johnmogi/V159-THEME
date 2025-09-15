@@ -163,7 +163,20 @@ if ( ! function_exists( 'hello_elementor_scripts_styles' ) ) {
 add_action( 'wp_enqueue_scripts', 'hello_elementor_scripts_styles' );
 
 // Include Working Signals Manager
-require_once get_template_directory() . '/includes/signals-manager-working.php';
+if (file_exists(get_template_directory() . '/includes/signals-manager-working.php')) {
+    require_once get_template_directory() . '/includes/signals-manager-working.php';
+    error_log('DEBUG: Signals manager loaded successfully');
+} else {
+    error_log('ERROR: Signals manager file not found');
+}
+
+// Initialize Signals Manager
+if (class_exists('Working_Signals_Manager')) {
+    new Working_Signals_Manager();
+    error_log('DEBUG: Signals manager initialized');
+} else {
+    error_log('ERROR: Working_Signals_Manager class not found');
+}
 
 // Configure Signals Subscription Products
 add_filter('signals_subscription_product_ids', function($product_ids) {

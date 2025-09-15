@@ -10,12 +10,19 @@ if (!defined('ABSPATH')) {
 class Working_Signals_Manager {
     
     public function __construct() {
-        add_filter('woocommerce_account_menu_items', [$this, 'add_menu_item']);
-        add_action('woocommerce_account_content', [$this, 'maybe_show_signals_content']);
-        add_action('wp_enqueue_scripts', [$this, 'enqueue_styles']);
+        error_log('DEBUG: Working_Signals_Manager constructor called');
         
-        // Handle menu item clicks
-        add_filter('woocommerce_get_endpoint_url', [$this, 'signals_endpoint_url'], 10, 4);
+        // Hook into WordPress init with higher priority
+        add_action('init', [$this, 'add_endpoints'], 5);
+        add_filter('query_vars', [$this, 'add_query_vars']);
+        
+        // Hook into WooCommerce with proper timing
+        add_action('woocommerce_init', [$this, 'init_woocommerce_hooks']);
+        
+        // Fallback hooks for non-WooCommerce scenarios
+        add_action('wp', [$this, 'maybe_show_signals_content'], 20);
+        add_action('template_redirect', [$this, 'handle_signals_endpoint']);
+        add_action('wp_enqueue_scripts', [$this, 'enqueue_styles']);
     }
     
     public function add_menu_item($items) {
@@ -25,20 +32,68 @@ class Working_Signals_Manager {
             if ($key === 'dashboard') {
                 $new_items['signals'] = 'איתותים';
             }
+            // Remove redundant Subscriptions link
+            if ($key === 'wps_subscriptions') {
+                continue;
+            }
         }
         return $new_items;
     }
     
-    public function signals_endpoint_url($url, $endpoint, $value, $permalink) {
-        if ($endpoint === 'signals') {
-            return wc_get_account_endpoint_url('dashboard') . '?signals=1';
+    public function add_endpoints() {
+        add_rewrite_endpoint('signals', EP_ROOT | EP_PAGES);
+    }
+    
+    public function init_woocommerce_hooks() {
+        error_log('DEBUG: WooCommerce hooks initialized');
+        add_filter('woocommerce_account_menu_items', [$this, 'add_menu_item']);
+        add_action('woocommerce_account_content', [$this, 'maybe_show_signals_content']);
+        add_action('woocommerce_account_signals_endpoint', [$this, 'signals_content']);
+    }
+    
+    public function add_query_vars($vars) {
+        $vars[] = 'signals';
+        return $vars;
+    }
+    
+    public function handle_signals_endpoint() {
+        global $wp_query;
+        
+        error_log('DEBUG: handle_signals_endpoint called - URI: ' . $_SERVER['REQUEST_URI']);
+        
+        // Check if we're accessing the direct signals URL
+        if (strpos($_SERVER['REQUEST_URI'], '/my-account/signals') !== false) {
+            error_log('DEBUG: Redirecting signals URL');
+            wp_redirect(home_url('/my-account/?signals=1'));
+            exit;
         }
-        return $url;
+        
+        // Check if we're on the My Account page with signals endpoint
+        if (is_account_page() && isset($wp_query->query_vars['signals'])) {
+            error_log('DEBUG: Redirecting endpoint to query param');
+            wp_redirect(wc_get_account_endpoint_url('dashboard') . '?signals=1');
+            exit;
+        }
     }
     
     public function maybe_show_signals_content() {
-        // Check if we're viewing the signals section
+        global $wp_query;
+        
+        error_log('DEBUG: maybe_show_signals_content called');
+        error_log('DEBUG: $_GET signals: ' . (isset($_GET['signals']) ? $_GET['signals'] : 'not set'));
+        error_log('DEBUG: query_vars signals: ' . (isset($wp_query->query_vars['signals']) ? $wp_query->query_vars['signals'] : 'not set'));
+        error_log('DEBUG: REQUEST_URI: ' . $_SERVER['REQUEST_URI']);
+        
+        // Check if we're viewing the signals section via query parameter
         if (isset($_GET['signals']) || (isset($_GET['page']) && $_GET['page'] === 'signals')) {
+            error_log('DEBUG: Showing signals via query parameter');
+            $this->signals_content();
+            return;
+        }
+        
+        // Check if we're on the signals endpoint
+        if (isset($wp_query->query_vars['signals'])) {
+            error_log('DEBUG: Showing signals via endpoint');
             $this->signals_content();
             return;
         }
@@ -46,13 +101,16 @@ class Working_Signals_Manager {
         // Check if current URL contains signals
         $current_url = $_SERVER['REQUEST_URI'];
         if (strpos($current_url, '/signals') !== false) {
+            error_log('DEBUG: Showing signals via URL match');
             $this->signals_content();
             return;
         }
+        
+        error_log('DEBUG: No signals match found');
     }
     
     public function signals_content() {
-        error_log('Signals content called - user ID: ' . get_current_user_id());
+        error_log('DEBUG: Signals content called - user ID: ' . get_current_user_id());
         
         if (!$this->user_has_access()) {
             $this->show_paywall();
@@ -98,25 +156,17 @@ class Working_Signals_Manager {
             9 => 'ספטמבר', 10 => 'אוקטובר', 11 => 'נובמבר', 12 => 'דצמבר'
         ];
         
-        // Query signals
+        // Query signals - simplified to show all signals for now
         $signals = new WP_Query([
             'post_type' => 'signal',
             'posts_per_page' => -1,
-            'meta_query' => [
-                [
-                    'key' => 'signal_date',
-                    'value' => [
-                        $year . '-' . sprintf('%02d', $month) . '-01',
-                        $year . '-' . sprintf('%02d', $month) . '-31'
-                    ],
-                    'compare' => 'BETWEEN',
-                    'type' => 'DATE'
-                ]
-            ],
-            'meta_key' => 'signal_date',
-            'orderby' => 'meta_value',
+            'post_status' => 'publish',
+            'orderby' => 'date',
             'order' => 'DESC'
         ]);
+        
+        // Debug logging
+        error_log('Signals query - Found: ' . $signals->found_posts . ' signals');
         
         ?>
         <div class="signals-dashboard" dir="rtl" style="font-family: Arial, sans-serif;">
@@ -143,19 +193,19 @@ class Working_Signals_Manager {
             </div>
             
             <?php if ($signals->have_posts()): ?>
-                <div style="overflow-x: auto;">
-                    <table class="signals-table" style="width: 100%; border-collapse: collapse; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border-radius: 5px; overflow: hidden;">
+                <div style="overflow-x: auto; margin: 20px 0;">
+                    <table class="signals-table" style="width: 100%; border-collapse: collapse; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border-radius: 5px; overflow: hidden; background: white;">
                         <thead>
-                            <tr style="background: #0073aa; color: white;">
-                                <th style="padding: 12px; border: 1px solid #ddd; text-align: center; font-weight: bold;">מס׳ נייר</th>
-                                <th style="padding: 12px; border: 1px solid #ddd; text-align: center; font-weight: bold;">שם הנייר</th>
-                                <th style="padding: 12px; border: 1px solid #ddd; text-align: center; font-weight: bold;">תאריך האיתות</th>
-                                <th style="padding: 12px; border: 1px solid #ddd; text-align: center; font-weight: bold;">שער הקניה</th>
-                                <th style="padding: 12px; border: 1px solid #ddd; text-align: center; font-weight: bold;">יעד מחיר</th>
-                                <th style="padding: 12px; border: 1px solid #ddd; text-align: center; font-weight: bold;">מחיר סטופ לוס</th>
-                                <th style="padding: 12px; border: 1px solid #ddd; text-align: center; font-weight: bold;">שער נוכחי</th>
-                                <th style="padding: 12px; border: 1px solid #ddd; text-align: center; font-weight: bold;">תאריך הסגירה</th>
-                                <th style="padding: 12px; border: 1px solid #ddd; text-align: center; font-weight: bold;">אחוז רווח או הפסד</th>
+                            <tr style="background: #0073aa !important; color: white !important;">
+                                <th style="padding: 12px; border: 1px solid #0073aa; text-align: center; font-weight: bold; color: white !important;">מס׳ נייר</th>
+                                <th style="padding: 12px; border: 1px solid #0073aa; text-align: center; font-weight: bold; color: white !important;">שם הנייר</th>
+                                <th style="padding: 12px; border: 1px solid #0073aa; text-align: center; font-weight: bold; color: white !important;">תאריך האיתות</th>
+                                <th style="padding: 12px; border: 1px solid #0073aa; text-align: center; font-weight: bold; color: white !important;">שער הקניה</th>
+                                <th style="padding: 12px; border: 1px solid #0073aa; text-align: center; font-weight: bold; color: white !important;">יעד מחיר</th>
+                                <th style="padding: 12px; border: 1px solid #0073aa; text-align: center; font-weight: bold; color: white !important;">מחיר סטופ לוס</th>
+                                <th style="padding: 12px; border: 1px solid #0073aa; text-align: center; font-weight: bold; color: white !important;">שער נוכחי</th>
+                                <th style="padding: 12px; border: 1px solid #0073aa; text-align: center; font-weight: bold; color: white !important;">תאריך הסגירה</th>
+                                <th style="padding: 12px; border: 1px solid #0073aa; text-align: center; font-weight: bold; color: white !important;">אחוז רווח או הפסד</th>
                             </tr>
                         </thead>
                         <tbody>
