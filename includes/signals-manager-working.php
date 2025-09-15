@@ -327,8 +327,13 @@ class Working_Signals_Manager {
                     'profit_loss' => get_field('%_profitloss', $post_id) ?: ''
                 ];
                 
-                error_log('DEBUG: Signal data: ' . print_r($signal_data, true));
-                $signals[] = $signal_data;
+                // Only add signals with valid data
+                if (!empty($signal_data['security_name']) || !empty($signal_data['security_number'])) {
+                    error_log('DEBUG: Adding signal data: ' . print_r($signal_data, true));
+                    $signals[] = $signal_data;
+                } else {
+                    error_log('DEBUG: Skipping empty signal for post ID: ' . $post_id);
+                }
             }
         }
         wp_reset_postdata();
@@ -344,23 +349,13 @@ class Working_Signals_Manager {
         // Get real signals from CPT
         $signals = $this->get_signals_data($current_month, $current_year);
         
+        error_log('DEBUG: Dashboard received ' . count($signals) . ' signals to display');
+        
         $hebrew_months = [
             1 => 'ינואר', 2 => 'פברואר', 3 => 'מרץ', 4 => 'אפריל',
             5 => 'מאי', 6 => 'יוני', 7 => 'יולי', 8 => 'אוגוסט',
             9 => 'ספטמבר', 10 => 'אוקטובר', 11 => 'נובמבר', 12 => 'דצמבר'
         ];
-        
-        // Query signals - simplified to show all signals for now
-        $signals = new WP_Query([
-            'post_type' => 'signal',
-            'posts_per_page' => -1,
-            'post_status' => 'publish',
-            'orderby' => 'date',
-            'order' => 'DESC'
-        ]);
-        
-        // Debug logging
-        error_log('Signals query - Found: ' . $signals->found_posts . ' signals');
         
         ?>
         <div class="signals-dashboard" dir="rtl" style="font-family: Arial, sans-serif; max-width: 1200px; margin: 0 auto;">
@@ -386,23 +381,23 @@ class Working_Signals_Manager {
                 </select>
             </div>
             
-            <?php if (!empty($signals)): ?>
-                <div style="overflow-x: auto; margin: 20px 0;">
-                    <table id="signals-table" class="signals-table" style="width: 100%; border-collapse: collapse; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border-radius: 5px; overflow: hidden; background: white;">
-                        <thead>
-                            <tr style="background: #0073aa !important; color: white !important;">
-                                <th style="padding: 12px; border: 1px solid #0073aa; text-align: center; font-weight: bold; color: white !important;">מס׳ נייר</th>
-                                <th style="padding: 12px; border: 1px solid #0073aa; text-align: center; font-weight: bold; color: white !important;">שם הנייר</th>
-                                <th style="padding: 12px; border: 1px solid #0073aa; text-align: center; font-weight: bold; color: white !important;">תאריך האיתות</th>
-                                <th style="padding: 12px; border: 1px solid #0073aa; text-align: center; font-weight: bold; color: white !important;">שער הקניה</th>
-                                <th style="padding: 12px; border: 1px solid #0073aa; text-align: center; font-weight: bold; color: white !important;">יעד מחיר</th>
-                                <th style="padding: 12px; border: 1px solid #0073aa; text-align: center; font-weight: bold; color: white !important;">מחיר סטופ לוס</th>
-                                <th style="padding: 12px; border: 1px solid #0073aa; text-align: center; font-weight: bold; color: white !important;">שער נוכחי</th>
-                                <th style="padding: 12px; border: 1px solid #0073aa; text-align: center; font-weight: bold; color: white !important;">תאריך הסגירה</th>
-                                <th style="padding: 12px; border: 1px solid #0073aa; text-align: center; font-weight: bold; color: white !important;">אחוז רווח או הפסד</th>
-                            </tr>
-                        </thead>
-                        <tbody>
+            <div style="overflow-x: auto; margin: 20px 0;">
+                <table id="signals-table" class="signals-table" style="width: 100%; border-collapse: collapse; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border-radius: 5px; overflow: hidden; background: white;">
+                    <thead>
+                        <tr style="background: #0073aa !important; color: white !important;">
+                            <th style="padding: 12px; border: 1px solid #0073aa; text-align: center; font-weight: bold; color: white !important;">מס׳ נייר</th>
+                            <th style="padding: 12px; border: 1px solid #0073aa; text-align: center; font-weight: bold; color: white !important;">שם הנייר</th>
+                            <th style="padding: 12px; border: 1px solid #0073aa; text-align: center; font-weight: bold; color: white !important;">תאריך האיתות</th>
+                            <th style="padding: 12px; border: 1px solid #0073aa; text-align: center; font-weight: bold; color: white !important;">שער הקניה</th>
+                            <th style="padding: 12px; border: 1px solid #0073aa; text-align: center; font-weight: bold; color: white !important;">יעד מחיר</th>
+                            <th style="padding: 12px; border: 1px solid #0073aa; text-align: center; font-weight: bold; color: white !important;">מחיר סטופ לוס</th>
+                            <th style="padding: 12px; border: 1px solid #0073aa; text-align: center; font-weight: bold; color: white !important;">שער נוכחי</th>
+                            <th style="padding: 12px; border: 1px solid #0073aa; text-align: center; font-weight: bold; color: white !important;">תאריך הסגירה</th>
+                            <th style="padding: 12px; border: 1px solid #0073aa; text-align: center; font-weight: bold; color: white !important;">אחוז רווח או הפסד</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php if (!empty($signals)): ?>
                             <?php 
                             $row_count = 0;
                             foreach ($signals as $signal): 
@@ -444,15 +439,17 @@ class Working_Signals_Manager {
                                     <td style="padding: 10px; border: 1px solid #ddd; text-align: center; <?php echo $profit_color; ?>"><?php echo $profit_loss ?: '—'; ?></td>
                                 </tr>
                             <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                </div>
-            <?php else: ?>
-                <div style="text-align: center; padding: 40px; background: #f9f9f9; border-radius: 5px; margin: 20px 0;">
-                    <h3 style="color: #666;">לא נמצאו איתותים</h3>
-                    <p>לא נמצאו איתותים עבור <?php echo $hebrew_months[$current_month] . ' ' . $current_year; ?></p>
-                </div>
-            <?php endif; ?>
+                        <?php else: ?>
+                            <tr>
+                                <td colspan="9" style="text-align: center; padding: 40px; color: #666;">
+                                    <h3>לא נמצאו איתותים</h3>
+                                    <p>לא נמצאו איתותים עבור <?php echo $hebrew_months[$current_month] . ' ' . $current_year; ?></p>
+                                </td>
+                            </tr>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
             
             <!-- Add DataTables CSS and JS -->
             <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.css">
