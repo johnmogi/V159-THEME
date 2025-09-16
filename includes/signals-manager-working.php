@@ -187,7 +187,7 @@ class Working_Signals_Manager {
         error_log('DEBUG: WooCommerce hooks initialized');
         add_filter('woocommerce_account_menu_items', [$this, 'add_menu_item']);
         add_action('woocommerce_account_content', [$this, 'maybe_show_signals_content'], 5);
-        add_action('woocommerce_account_signals_endpoint', [$this, 'signals_content']);
+        // Removed duplicate signals_content hook to prevent double rendering
     }
     
     public function add_query_vars($vars) {
@@ -207,6 +207,12 @@ class Working_Signals_Manager {
     
     public function maybe_show_signals_content() {
         global $wp_query;
+        static $signals_rendered = false;
+        
+        // Prevent multiple renders
+        if ($signals_rendered) {
+            return;
+        }
         
         // Only show on My Account page with signals parameter
         if (!is_account_page()) {
@@ -215,6 +221,7 @@ class Working_Signals_Manager {
         
         // Check if we're viewing the signals section via query parameter
         if (isset($_GET['signals'])) {
+            $signals_rendered = true;
             $this->signals_content();
             // Prevent default content
             return true;
@@ -222,6 +229,7 @@ class Working_Signals_Manager {
         
         // Check if we're on the signals endpoint
         if (isset($wp_query->query_vars['signals'])) {
+            $signals_rendered = true;
             $this->signals_content();
             return true;
         }
@@ -413,10 +421,17 @@ class Working_Signals_Manager {
                                 $close_date = isset($signal['close_date']) ? $signal['close_date'] : '';
                                 $profit_loss = isset($signal['profit_loss']) ? $signal['profit_loss'] : '';
                                 
-                                // Calculate live profit/loss if not stored
-                                if (empty($profit_loss) && empty($close_date) && is_numeric($buy_price) && is_numeric($current_price)) {
-                                    $calc = (($current_price - $buy_price) / $buy_price) * 100;
-                                    $profit_loss = number_format($calc, 2) . '%';
+                                // Calculate profit/loss percentage based on stock profitability formula
+                                if (empty($profit_loss) && is_numeric($buy_price) && $buy_price > 0) {
+                                    if (!empty($close_date) && is_numeric($current_price)) {
+                                        // Closed position: use current_price as exit price
+                                        $calc = (($current_price - $buy_price) / $buy_price) * 100;
+                                        $profit_loss = number_format($calc, 2) . '%';
+                                    } elseif (empty($close_date) && is_numeric($current_price)) {
+                                        // Open position: calculate unrealized profit/loss
+                                        $calc = (($current_price - $buy_price) / $buy_price) * 100;
+                                        $profit_loss = number_format($calc, 2) . '%';
+                                    }
                                 }
                                 
                                 $profit_color = '';
